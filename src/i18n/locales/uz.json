@@ -1,0 +1,52 @@
+{
+  "nav": {
+    "logo": "Aholi Muammolari",
+    "report": "Muammo yuborish",
+    "problems": "Muammolar"
+  },
+  "hero": {
+    "headline": "Mahalliy muammolarni birga hal qilamiz",
+    "subtext": "Muammoingizni yozing, mahalla va davlat organlari bilan ulashing.",
+    "cta": "Muammo yuborish"
+  },
+  "categories": {
+    "title": "Kategoriyalar",
+    "water": "Suv muammosi",
+    "electricity": "Elektr energiyasi",
+    "roads": "Yo'l ta'mirlash",
+    "internet": "Internet / aloqa",
+    "waste": "Chiqindi / ekologiya",
+    "other": "Boshqa"
+  },
+  "problems": {
+    "top": "Eng ko'p ovoz olgan",
+    "all": "Barcha muammolar",
+    "votes": "ovoz",
+    "noResults": "Muammolar topilmadi.",
+    "filterByCategory": "Kategoriya bo'yicha",
+    "search": "Qidirish (matn)",
+    "like": "Ovoz berish",
+    "liked": "Ovoz berildi"
+  },
+  "howItWorks": {
+    "title": "Qanday ishlaydi",
+    "step1": "Muammoingizni yozing",
+    "step2": "Ovoz bering va boshqalarni qo'llab-quvvatlang",
+    "step3": "Javobgar organlar javob beradi"
+  },
+  "footer": {
+    "copy": "Aholi Muammolari"
+  },
+  "form": {
+    "title": "Muammo yuborish",
+    "region": "Hudud",
+    "category": "Kategoriya",
+    "description": "Tavsif",
+    "submit": "Yuborish",
+    "cancel": "Bekor qilish",
+    "required": "Majburiy maydon",
+    "maxLength": "Maksimal {max} belgi",
+    "rateLimit": "30 soniyadan keyin qayta urinib ko'ring.",
+    "success": "Yuborildi. Rahmat!"
+  }
+}

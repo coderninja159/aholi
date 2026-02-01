@@ -1,0 +1,52 @@
+{
+  "nav": {
+    "logo": "Citizen Problems",
+    "report": "Report problem",
+    "problems": "Problems"
+  },
+  "hero": {
+    "headline": "Solving local problems together",
+    "subtext": "Describe your problem and share with the community and authorities.",
+    "cta": "Report problem"
+  },
+  "categories": {
+    "title": "Categories",
+    "water": "Water issue",
+    "electricity": "Electricity",
+    "roads": "Road repair",
+    "internet": "Internet / connectivity",
+    "waste": "Waste / ecology",
+    "other": "Other"
+  },
+  "problems": {
+    "top": "Top voted",
+    "all": "All problems",
+    "votes": "votes",
+    "noResults": "No problems found.",
+    "filterByCategory": "By category",
+    "search": "Search (text)",
+    "like": "Vote",
+    "liked": "Voted"
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "step1": "Describe your problem",
+    "step2": "Vote and support others",
+    "step3": "Authorities respond"
+  },
+  "footer": {
+    "copy": "Citizen Problems"
+  },
+  "form": {
+    "title": "Report problem",
+    "region": "Region",
+    "category": "Category",
+    "description": "Description",
+    "submit": "Submit",
+    "cancel": "Close",
+    "required": "Required field",
+    "maxLength": "Max {max} characters",
+    "rateLimit": "Try again in 30 seconds.",
+    "success": "Submitted. Thank you!"
+  }
+}
