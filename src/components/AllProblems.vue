@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useProblemsStore } from '@/stores/problems'
 import { PAGINATION, CATEGORIES } from '@/config'
+import AllProblemsSkeleton from './AllProblemsSkeleton.vue'
 
 const { t } = useI18n()
 const problemsStore = useProblemsStore()
@@ -90,7 +91,7 @@ onMounted(() => {
           </option>
         </select>
       </div>
-      <div v-if="problemsStore.loading" class="text-center text-gray-500 py-8">Loading…</div>
+      <AllProblemsSkeleton v-if="problemsStore.loading" />
       <div v-else class="space-y-4">
         <div
           v-for="p in paginated"

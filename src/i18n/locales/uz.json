@@ -5,10 +5,16 @@
     "problems": "Muammolar"
   },
   "hero": {
-    "headline": "Mahalliy muammolarni birga hal qilamiz",
-    "subtext": "Muammoingizni yozing, mahalla va davlat organlari bilan ulashing.",
-    "cta": "Muammo yuborish"
-  },
+  "badge": "Onlayn yechimlar platformasi",
+  "headline": "Muammoingizni bildirib qo‘ying",
+  "subtext": "Suv, elektr, yo‘l, internet yoki ekologiya muammolarini yozing. Eng ko‘p qo‘llab-quvvatlanganlari yuqorida chiqadi.",
+  "cta": "Muammo yuborish",
+  "stats": {
+    "regions": "Viloyat",
+    "categories": "Kategoriya",
+    "problems": "Muammo"
+  }
+},
   "categories": {
     "title": "Kategoriyalar",
     "water": "Suv muammosi",

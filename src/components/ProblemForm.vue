@@ -3,6 +3,7 @@ import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useFormStore } from '@/stores/form'
 import { REGIONS, CATEGORIES } from '@/config'
+import RegionSelect from './RegionSelect.vue'
 
 const { t } = useI18n()
 const formStore = useFormStore()
@@ -120,23 +121,13 @@ watch(
           >
             {{ t('form.region') }} *
           </label>
-          <select
+          <RegionSelect
             id="form-region"
             v-model="region"
-            required
-            class="input-focus-ring w-full rounded-lg border px-4 py-2 text-gray-900 dark:text-gray-100 dark:bg-gray-800 transition-shadow"
-            :class="
-              errors.region
-                ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500 shadow-glow-danger'
-                : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:shadow-glow'
-            "
-          >
-            <option value="">{{ t('form.region') }}</option>
-            <option v-for="r in REGIONS" :key="r" :value="r">{{ r }}</option>
-          </select>
-          <p v-if="errors.region" class="mt-1 text-sm text-red-500 dark:text-red-400">
-            {{ errors.region }}
-          </p>
+            :options="REGIONS"
+            :placeholder="t('form.region')"
+            :error="errors.region"
+          />
         </div>
         <div>
           <label

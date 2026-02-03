@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useProblemsStore } from '@/stores/problems'
+import TopProblemsSkeleton from './TopProblemsSkeleton.vue'
 
 const { t } = useI18n()
 const problemsStore = useProblemsStore()
@@ -49,9 +50,7 @@ onMounted(() => {
       <h2 class="text-2xl md:text-3xl font-bold text-center mb-10 text-gray-900 dark:text-white">
         {{ t('problems.top') }}
       </h2>
-      <div v-if="problemsStore.loading" class="text-center text-gray-500 dark:text-gray-400 py-8">
-        Loading…
-      </div>
+      <TopProblemsSkeleton v-if="problemsStore.loading" />
       <div v-else-if="problemsStore.error" class="text-center text-red-500 py-8">
         {{ problemsStore.error }}
       </div>
