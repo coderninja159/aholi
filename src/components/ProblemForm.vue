@@ -54,7 +54,7 @@ async function submit() {
   isSubmitting.value = true
 
   // SIZNING YANGI GOOGLE SCRIPT MANZILINGIZ
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbyhqQ-jyWLDwfED6Xq07obRF649xntT482wUSYN3SihhqNz4OQQgVH9RjF32Wv_Hoo/exec'
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyhfhYIVjHIOdkvbcC3WzD-xXxjeySW23lSnAiNbWoiNI-HFz3k4ys3KpAS99K18tWJ/exec'
 
   try {
     // Ma'lumotlarni tayyorlash (JSON formatida)
