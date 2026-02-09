@@ -1,90 +1,52 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { apiList, apiVote } from '@/api/client'
-import { CATEGORIES } from '@/config'
 
-const VOTED_IDS_KEY = 'aholi-muammolari-voted'
-
-function getVotedIds() {
-  try {
-    const raw = localStorage.getItem(VOTED_IDS_KEY)
-    return raw ? new Set(JSON.parse(raw)) : new Set()
-  } catch {
-    return new Set()
-  }
-}
-
-function saveVotedIds(set) {
-  localStorage.setItem(VOTED_IDS_KEY, JSON.stringify([...set]))
-}
+// Google Script URL (doGet uchun ham, doPost uchun ham manzil bir xil)
+const API_URL = 'https://script.google.com/macros/s/AKfycbxd3YLVuE4QtERXNEwY9axi5E7Kvo-1ZEo_yce1d7t1tHKA28Ub0oS2mFZ03sabz0Kv/exec'
 
 export const useProblemsStore = defineStore('problems', () => {
-  const rawList = ref([])
-  const votedIds = ref(getVotedIds())
+  const list = ref([])
   const loading = ref(false)
   const error = ref(null)
   const activeCategory = ref(null)
 
-  const list = computed(() => rawList.value)
-
-  function normalizeCategory(cat) {
-    if (!cat || !CATEGORIES.includes(cat)) return 'Boshqa'
-    return cat
-  }
-
+  // Ma’lumotlarni olish (Fetch)
   async function fetchList() {
     loading.value = true
     error.value = null
     try {
-      const data = await apiList()
-      rawList.value = (data || []).map((row) => ({
-        id: row.id,
-        region: row.region || '',
-        category: normalizeCategory(row.category),
-        description: row.description || '',
-        votes: Number(row.votes) || 0,
-        createdAt: row.createdAt || row.created_at || '',
-      }))
-    } catch (e) {
-      error.value = e.message || 'Failed to load'
-      rawList.value = []
+      const response = await fetch(API_URL)
+      if (!response.ok) throw new Error('Ma\'lumotlarni olishda xatolik')
+      
+      const data = await response.json()
+      list.value = data // Google Sheetsdan kelgan ma’lumotlar
+    } catch (err) {
+      console.error(err)
+      error.value = 'Server bilan bog‘lanib bo‘lmadi'
     } finally {
       loading.value = false
     }
   }
 
-  function hasVoted(id) {
-    return votedIds.value.has(String(id))
-  }
-
-  function addVotedId(id) {
-    const next = new Set(votedIds.value)
-    next.add(String(id))
-    votedIds.value = next
-    saveVotedIds(next)
-  }
-
-  function removeVotedId(id) {
-    const next = new Set(votedIds.value)
-    next.delete(String(id))
-    votedIds.value = next
-    saveVotedIds(next)
-  }
+  // Ovoz berish (Hozircha frontendda ko‘rsatish uchun, aslida backendda bo‘lishi kerak)
+  // Simple uchun xotirada oshirib qo‘yamiz
+  const votedIds = ref(new Set())
 
   async function vote(id) {
-    if (hasVoted(id)) return
-    const item = rawList.value.find((p) => p.id === id)
-    if (!item) return
-    const prevVotes = item.votes
-    item.votes += 1
-    addVotedId(id)
-    try {
-      await apiVote(id)
-    } catch {
-      item.votes = prevVotes
-      removeVotedId(id)
-      throw new Error('Vote failed')
+    if (votedIds.value.has(id)) return
+    
+    // Optimistik update (UI tezda yangilanadi)
+    const problem = list.value.find(p => p.id === id)
+    if (problem) {
+      problem.votes++
+      votedIds.value.add(id)
     }
+    
+    // Agar backendda ovoz saqlash bo'lsa, shu yerga fetch qo'shiladi
+  }
+
+  function hasVoted(id) {
+    return votedIds.value.has(id)
   }
 
   return {
@@ -94,7 +56,6 @@ export const useProblemsStore = defineStore('problems', () => {
     activeCategory,
     fetchList,
     vote,
-    hasVoted,
-    normalizeCategory,
+    hasVoted
   }
 })

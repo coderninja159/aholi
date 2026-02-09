@@ -8,7 +8,7 @@ import AllProblems from './components/AllProblems.vue'
 import HowItWorks from './components/HowItWorks.vue'
 import Footer from './components/Footer.vue'
 import ProblemForm from './components/ProblemForm.vue'
-import { useProblemsStore } from '@/stores/problems'
+import { useProblemsStore } from './stores/problems'
 
 const showFormModal = ref(false)
 const problemsStore = useProblemsStore()

@@ -28,36 +28,76 @@ defineProps({
   background: linear-gradient(
     90deg,
     rgb(229 231 235) 0%,
-    rgb(243 244 246) 50%,
+    rgb(243 244 246) 40%,
+    rgb(255 255 255) 50%,
+    rgb(243 244 246) 60%,
     rgb(229 231 235) 100%
   );
   background-size: 200% 100%;
-  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  /* O'zgartirish: linear va tezroq (1.2s) */
+  animation: skeleton-shimmer 1.2s linear infinite;
 }
 
 :global(.dark) .skeleton-line {
   background: linear-gradient(
     90deg,
-    rgb(75 85 99) 0%,
+    rgb(55 65 81) 0%,
+    rgb(75 85 99) 40%,
     rgb(107 114 128) 50%,
-    rgb(75 85 99) 100%
+    rgb(75 85 99) 60%,
+    rgb(55 65 81) 100%
   );
   background-size: 200% 100%;
 }
 
 @keyframes skeleton-shimmer {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton-line {
     animation: none;
-    background-size: 100% 100%;
+    background-color: rgb(229 231 235);
+  }
+}
+
+.skeleton-line {
+  @apply relative overflow-hidden;
+  background: linear-gradient(
+    90deg,
+    rgb(229 231 235) 0%,
+    rgb(243 244 246) 40%,
+    rgb(255 255 255) 50%,
+    rgb(243 244 246) 60%,
+    rgb(229 231 235) 100%
+  );
+  background-size: 200% 100%;
+  /* O'zgartirish: linear va tezroq (1.2s) */
+  animation: skeleton-shimmer 1.2s linear infinite;
+}
+
+:global(.dark) .skeleton-line {
+  background: linear-gradient(
+    90deg,
+    rgb(55 65 81) 0%,
+    rgb(75 85 99) 40%,
+    rgb(107 114 128) 50%,
+    rgb(75 85 99) 60%,
+    rgb(55 65 81) 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-line {
+    animation: none;
+    background-color: rgb(229 231 235);
   }
 }
 </style>
