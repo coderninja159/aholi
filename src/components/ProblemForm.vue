@@ -78,6 +78,41 @@ watch(
     errors.value = { region: '', category: '', description: '' }
   }
 )
+const handleSubmit = async () => {
+  if (!title.value || !region.value || !newProblem.value) {
+    alert("Iltimos, barcha maydonlarni to'ldiring!");
+    return;
+  }
+
+  loading.value = true;
+  // Siz olgan linkni shu yerga qo'ydim:
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbxd3YLVuE4QtERXNEwY9axi5E7Kvo-1ZEo_yce1d7t1tHKA28Ub0oS2mFZ03sabz0Kv/exec';
+
+  const formData = new FormData();
+  formData.append('sarlavha', title.value);
+  formData.append('hudud', region.value);
+  formData.append('sharh', newProblem.value);
+
+  try {
+    await fetch(scriptURL, {
+      method: 'POST',
+      body: formData,
+      mode: 'no-cors' // Google Script uchun bu shart
+    });
+
+    alert("Rahmat! Ma'lumotlaringiz qabul qilindi.");
+    
+    // Formani tozalash
+    title.value = '';
+    region.value = '';
+    newProblem.value = '';
+  } catch (error) {
+    console.error('Xatolik:', error);
+    alert("Yuborishda xatolik yuz berdi.");
+  } finally {
+    loading.value = false;
+  }
+}
 </script>
 
 <template>
