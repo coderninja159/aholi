@@ -1,59 +1,59 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 
-// Google Script URL (doGet uchun ham, doPost uchun ham manzil bir xil)
-const API_URL = 'https://script.google.com/macros/s/AKfycbyhfhYIVjHIOdkvbcC3WzD-xXxjeySW23lSnAiNbWoiNI-HFz3k4ys3KpAS99K18tWJ/exec'
+const API_URL = 'https://script.google.com/macros/s/AKfycbzXEm8WTgD3TrcsM7RVmvwo0jT8E_XiW4GhFDI1i6UOmCJJBwfS_gvttIz2jcpfFG2r/exec'
 
 export const useProblemsStore = defineStore('problems', () => {
   const list = ref([])
   const loading = ref(false)
   const error = ref(null)
   const activeCategory = ref(null)
+  
+  // Qaysi IDga ovoz berilganini eslaydigan set (Frontend uchun)
+  const votedIds = ref(new Set())
 
-  // Ma’lumotlarni olish (Fetch)
   async function fetchList() {
     loading.value = true
     error.value = null
     try {
       const response = await fetch(API_URL)
-      
-      // Google ba'zida status 200 qaytarmaydi, shuni tekshiramiz
-      if (!response.ok && response.status !== 200) {
-        throw new Error(`Server xatosi: ${response.status}`)
-      }
-      
       const text = await response.text()
-      // Agar response JSON bo'lmasa xatolik beradi
-      try {
-        const data = JSON.parse(text)
-        list.value = data 
-      } catch (e) {
-        console.error("JSON parse xatosi:", text)
-        throw new Error("Ma'lumot noto'g'ri keldi")
-      }
+      const data = JSON.parse(text)
+      list.value = data
     } catch (err) {
-      console.error("Fetch error:", err)
-      error.value = 'Server bilan bog‘lanib bo‘lmadi. Internetni tekshiring.'
+      console.error(err)
+      error.value = 'Xatolik'
     } finally {
       loading.value = false
     }
   }
 
-  // Ovoz berish (Hozircha frontendda ko‘rsatish uchun, aslida backendda bo‘lishi kerak)
-  // Simple uchun xotirada oshirib qo‘yamiz
-  const votedIds = ref(new Set())
-
   async function vote(id) {
-    if (votedIds.value.has(id)) return
-    
-    // Optimistik update (UI tezda yangilanadi)
+    if (votedIds.value.has(id)) return // Allaqachon bosilgan bo'lsa
+
+    // 1. UI ni darhol yangilash (Optimistik)
     const problem = list.value.find(p => p.id === id)
     if (problem) {
       problem.votes++
       votedIds.value.add(id)
     }
-    
-    // Agar backendda ovoz saqlash bo'lsa, shu yerga fetch qo'shiladi
+
+    // 2. Serverga yuborish
+    try {
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'vote', id: id })
+      })
+    } catch (err) {
+      // Agar xato bo'lsa, UI ni qaytarish (ixtiyoriy)
+      if (problem) {
+        problem.votes--
+        votedIds.value.delete(id)
+      }
+      console.error("Vote failed", err)
+    }
   }
 
   function hasVoted(id) {
