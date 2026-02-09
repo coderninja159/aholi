@@ -1,103 +1,43 @@
 <script setup>
-defineProps({
-  lines: { type: Number, default: 2 },
-})
+defineProps({ lines: { type: Number, default: 2 } })
 </script>
 
 <template>
-  <div
-    class="skeleton-card glass-card p-4 rounded-xl border border-gray-200/50 dark:border-gray-600/50 overflow-hidden"
-  >
-    <div class="skeleton-line h-4 rounded mb-2 w-full max-w-full" />
-    <div
-      v-for="i in lines - 1"
-      :key="i"
-      class="skeleton-line h-4 rounded mb-2 w-full"
-      :class="{ 'max-w-[85%]': i === 1 }"
-    />
-    <div class="flex justify-between items-center mt-3">
-      <div class="skeleton-line h-3 rounded w-32" />
-      <div class="skeleton-line h-8 rounded-lg w-24" />
+  <div class="bg-gray-800/30 border border-gray-700/30 p-5 rounded-xl overflow-hidden">
+    <!-- Header Skeleton -->
+    <div class="flex items-center gap-3 mb-4">
+      <div class="w-8 h-8 rounded-lg bg-gray-700/50"></div>
+      <div class="flex-1 space-y-2">
+        <div class="h-3 bg-gray-700/50 rounded w-1/3"></div>
+        <div class="h-2 bg-gray-700/30 rounded w-1/2"></div>
+      </div>
     </div>
+
+    <!-- Text Skeleton -->
+    <div class="space-y-2 mb-4">
+      <div class="h-2 bg-gray-700/30 rounded w-full"></div>
+      <div class="h-2 bg-gray-700/30 rounded w-5/6"></div>
+    </div>
+
+    <!-- Button Skeleton -->
+    <div class="h-8 bg-gray-700/30 rounded-full w-24 mx-auto"></div>
   </div>
 </template>
 
 <style scoped>
-.skeleton-line {
-  @apply relative overflow-hidden;
-  background: linear-gradient(
-    90deg,
-    rgb(229 231 235) 0%,
-    rgb(243 244 246) 40%,
-    rgb(255 255 255) 50%,
-    rgb(243 244 246) 60%,
-    rgb(229 231 235) 100%
-  );
-  background-size: 200% 100%;
-  /* O'zgartirish: linear va tezroq (1.2s) */
-  animation: skeleton-shimmer 1.2s linear infinite;
+/* Bu yerda "Dabdala" (porlash) animatsiyasi olib tashlandi yoki juda sekinlashtirildi */
+/* Faqat juda sekin, tushkun o'tish qo'yildi */
+@keyframes fade-load {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.6; }
 }
 
-:global(.dark) .skeleton-line {
-  background: linear-gradient(
-    90deg,
-    rgb(55 65 81) 0%,
-    rgb(75 85 99) 40%,
-    rgb(107 114 128) 50%,
-    rgb(75 85 99) 60%,
-    rgb(55 65 81) 100%
-  );
-  background-size: 200% 100%;
-}
-
-@keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+div {
+  animation: fade-load 2s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .skeleton-line {
-    animation: none;
-    background-color: rgb(229 231 235);
-  }
-}
-
-.skeleton-line {
-  @apply relative overflow-hidden;
-  background: linear-gradient(
-    90deg,
-    rgb(229 231 235) 0%,
-    rgb(243 244 246) 40%,
-    rgb(255 255 255) 50%,
-    rgb(243 244 246) 60%,
-    rgb(229 231 235) 100%
-  );
-  background-size: 200% 100%;
-  /* O'zgartirish: linear va tezroq (1.2s) */
-  animation: skeleton-shimmer 1.2s linear infinite;
-}
-
-:global(.dark) .skeleton-line {
-  background: linear-gradient(
-    90deg,
-    rgb(55 65 81) 0%,
-    rgb(75 85 99) 40%,
-    rgb(107 114 128) 50%,
-    rgb(75 85 99) 60%,
-    rgb(55 65 81) 100%
-  );
-  background-size: 200% 100%;
-}
-
-@keyframes skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .skeleton-line {
-    animation: none;
-    background-color: rgb(229 231 235);
-  }
+  div { animation: none; opacity: 0.7; }
 }
 </style>

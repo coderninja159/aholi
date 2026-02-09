@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 import { REGIONS, CATEGORIES } from '@/config'
 import RegionSelect from './RegionSelect.vue'
 
-// O'zgaruvchilar
 const { t } = useI18n()
 const emit = defineEmits(['close'])
 
@@ -14,9 +13,9 @@ const description = ref('')
 const honeypot = ref('')
 
 const errors = ref({ region: '', category: '', description: '' })
-const isSubmitting = ref(false) // Tugma holatini boshqarish uchun
+const isSubmitting = ref(false)
+const showSuccess = ref(false) // Yashil taxta uchun
 
-// Kategoriyalar tarjimasi
 const categoryKeys = {
   'Suv muammosi': 'water',
   'Elektr energiyasi': 'electricity',
@@ -30,64 +29,51 @@ function tCategory(cat) {
   return t(`categories.${categoryKeys[cat] || 'other'}`)
 }
 
-// Tekshirish (Validation)
 function validate() {
   const e = { region: '', category: '', description: '' }
   if (!region.value) e.region = t('form.required')
   if (!category.value) e.category = t('form.required')
-  
   const desc = (description.value || '').trim()
   if (!desc) e.description = t('form.required')
-  // Kerak bo'lsa maksimum uzunlikni ham qo'shishingiz mumkin
-  
   errors.value = e
   return !e.region && !e.category && !e.description
 }
 
-// YUBORISH FUNKSIYASI (Google Sheets bilan bog'langan)
 async function submit() {
   if (!validate()) return
-
-  // Honeypot (botlardan himoya)
   if (honeypot.value) return
 
   isSubmitting.value = true
-
-  // SIZNING YANGI GOOGLE SCRIPT MANZILINGIZ
-  const scriptURL = 'https://script.google.com/macros/s/AKfycbzXEm8WTgD3TrcsM7RVmvwo0jT8E_XiW4GhFDI1i6UOmCJJBwfS_gvttIz2jcpfFG2r/exec'
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbxd3YLVuE4QtERXNEwY9axi5E7Kvo-1ZEo_yce1d7t1tHKA28Ub0oS2mFZ03sabz0Kv/exec'
 
   try {
-    // Ma'lumotlarni tayyorlash (JSON formatida)
-    const payload = {
-      hudud: region.value,       // Sheetsda 'Hudud' deb ko'rinadi
-      kategoriya: category.value, // Sheetsda 'Kategoriya' deb ko'rinadi
-      sharh: description.value    // Sheetsda 'Sharh' deb ko'rinadi
-    }
-
-    // Google'ga yuborish
     await fetch(scriptURL, {
       method: 'POST',
       mode: 'no-cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(payload)
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        hudud: region.value,
+        kategoriya: category.value,
+        sharh: description.value
+      })
     })
 
-    alert("Ma'lumotlar muvaffaqiyatli yuborildi!")
-
-    // Formani tozalash
-    region.value = ''
-    category.value = ''
-    description.value = ''
-    errors.value = { region: '', category: '', description: '' }
-
-    // Modalni yopish
-    emit('close')
+    // MUVAFFAQIYATLI
+    showSuccess.value = true
+    
+    // 2 soniyadan keyin modalni yopish
+    setTimeout(() => {
+      region.value = ''
+      category.value = ''
+      description.value = ''
+      errors.value = { region: '', category: '', description: '' }
+      showSuccess.value = false
+      emit('close')
+    }, 2000)
 
   } catch (error) {
-    console.error('Xatolik:', error)
-    alert("Xatolik yuz berdi. Internetni tekshiring.")
+    console.error(error)
+    alert("Xatolik yuz berdi.")
   } finally {
     isSubmitting.value = false
   }
@@ -95,129 +81,72 @@ async function submit() {
 </script>
 
 <template>
-  <div
-    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="form-title"
-    @click.self="emit('close')"
-  >
-    <div
-      class="glass-card w-full max-w-lg rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-600/50 p-6 animate-in"
-    >
+  <!-- Yashil Taxta (Notification) -->
+  <Transition name="slide-fade">
+    <div v-if="showSuccess" class="fixed bottom-5 right-5 z-[200] bg-green-500 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-3 border-2 border-green-400">
+      <div class="bg-white/20 p-2 rounded-full">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <div>
+        <p class="font-bold text-lg">Jonatildi!</p>
+        <p class="text-sm opacity-90">Sizning muammolaringiz qabul qilindi.</p>
+      </div>
+    </div>
+  </Transition>
+
+  <!-- Modal Fon -->
+  <div class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" @click.self="emit('close')">
+    <div class="bg-gray-900/95 text-gray-300 w-full max-w-lg rounded-2xl shadow-2xl border border-gray-700 p-6 relative overflow-hidden">
+      <!-- Decorative blur -->
+      <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
+
       <div class="flex items-center justify-between mb-6">
-        <h2 id="form-title" class="text-xl font-bold text-gray-900 dark:text-white">
-          {{ t('form.title') }}
-        </h2>
-        <button
-          type="button"
-          class="p-2 rounded-lg hover:bg-gray-200/50 dark:hover:bg-gray-600/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-colors"
-          aria-label="Close"
-          @click="emit('close')"
-        >
-          ✕
-        </button>
+        <h2 class="text-xl font-bold text-white">{{ t('form.title') }}</h2>
+        <button @click="emit('close')" class="text-gray-400 hover:text-white transition-colors">✕</button>
       </div>
 
       <form class="space-y-4" @submit.prevent="submit">
-        <!-- Himoya maydoni (Yashirin) -->
-        <input
-          v-model="honeypot"
-          type="text"
-          name="website_url"
-          autocomplete="off"
-          tabindex="-1"
-          class="absolute opacity-0 pointer-events-none h-0 w-0"
-          aria-hidden="true"
-        />
-
-        <!-- HUDUD -->
+        <input v-model="honeypot" type="text" class="hidden" aria-hidden="true">
+        
+        <!-- Inputs -->
         <div>
-          <label
-            for="form-region"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ t('form.region') }} *
-          </label>
-          <RegionSelect
-            id="form-region"
-            v-model="region"
-            :options="REGIONS"
-            :placeholder="t('form.region')"
-            :error="errors.region"
-          />
+          <label class="block text-sm font-medium text-gray-400 mb-1">Hudud *</label>
+          <RegionSelect v-model="region" :options="REGIONS" :placeholder="t('form.region')" :error="errors.region" class="bg-gray-800 border-gray-700 text-gray-200" />
         </div>
 
-        <!-- KATEGORIYA -->
         <div>
-          <label
-            for="form-category"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ t('form.category') }} *
-          </label>
-          <select
-            id="form-category"
-            v-model="category"
-            required
-            class="input-focus-ring w-full rounded-lg border px-4 py-2 text-gray-900 dark:text-gray-100 dark:bg-gray-800 transition-shadow"
-            :class="
-              errors.category
-                ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500 shadow-glow-danger'
-                : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:shadow-glow'
-            "
-          >
-            <option value="">{{ t('form.category') }}</option>
+          <label class="block text-sm font-medium text-gray-400 mb-1">Kategoriya *</label>
+          <select v-model="category" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-200 focus:border-blue-500 focus:outline-none">
+            <option value="">Tanlang...</option>
             <option v-for="c in CATEGORIES" :key="c" :value="c">{{ tCategory(c) }}</option>
           </select>
-          <p v-if="errors.category" class="mt-1 text-sm text-red-500 dark:text-red-400">
-            {{ errors.category }}
-          </p>
         </div>
 
-        <!-- SHARH / TASVIR -->
         <div>
-          <label
-            for="form-description"
-            class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
-          >
-            {{ t('form.description') }} *
-          </label>
-          <textarea
-            id="form-description"
-            v-model="description"
-            rows="4"
-            class="input-focus-ring w-full rounded-lg border px-4 py-2 text-gray-900 dark:text-gray-100 dark:bg-gray-800 resize-y transition-shadow"
-            :class="
-              errors.description
-                ? 'border-red-500 focus:ring-red-500/50 focus:border-red-500 shadow-glow-danger'
-                : 'border-gray-300 dark:border-gray-600 focus:border-blue-500 focus:shadow-glow'
-            "
-            :placeholder="t('form.description')"
-          />
-          <p v-if="errors.description" class="mt-1 text-sm text-red-500 dark:text-red-400">
-            {{ errors.description }}
-          </p>
+          <label class="block text-sm font-medium text-gray-400 mb-1">Sharh *</label>
+          <textarea v-model="description" rows="4" class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-gray-200 focus:border-blue-500 focus:outline-none" placeholder="Muammoni yozing..."></textarea>
         </div>
 
-        <!-- TUGMALAR -->
         <div class="flex gap-3 pt-2">
-          <button
-            type="button"
-            class="flex-1 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500/50 transition-colors"
-            @click="emit('close')"
-          >
-            {{ t('form.cancel') }}
-          </button>
-          <button
-            type="submit"
-            :disabled="isSubmitting"
-            class="flex-1 px-4 py-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-500 disabled:opacity-50 hover:scale-[1.02] hover:shadow-glow active:scale-[0.98] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
-          >
-            {{ isSubmitting ? 'Yuborilmoqda...' : t('form.submit') }}
+          <button type="button" @click="emit('close')" class="flex-1 py-3 rounded-xl border border-gray-700 text-gray-300 hover:bg-gray-800 transition">Bekor qilish</button>
+          <button type="submit" :disabled="isSubmitting" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition-all transform active:scale-95 disabled:opacity-50">
+            {{ isSubmitting ? 'Yuborilmoqda...' : 'Yuborish' }}
           </button>
         </div>
       </form>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Taxta Animatsiyasi */
+.slide-fade-enter-active, .slide-fade-leave-active {
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.slide-fade-enter-from, .slide-fade-leave-to {
+  transform: translateY(20px);
+  opacity: 0;
+}
+</style>
