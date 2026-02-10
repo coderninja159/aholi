@@ -1,15 +1,17 @@
-import { ref, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 
 export function useReducedMotion() {
-  const reduced = ref(false)
+  const prefersReducedMotion = ref(false)
 
   onMounted(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    reduced.value = mq.matches
-    mq.addEventListener('change', (e) => {
-      reduced.value = e.matches
-    })
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    prefersReducedMotion.value = mediaQuery.matches
+    
+    const handler = (e) => prefersReducedMotion.value = e.matches
+    mediaQuery.addEventListener('change', handler)
+    
+    // Cleanup qo'shish mumkin (lekin oddiy uchun yetarli)
   })
 
-  return reduced
+  return computed(() => prefersReducedMotion.value)
 }

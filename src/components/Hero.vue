@@ -1,9 +1,6 @@
 <script setup>
-// App.vue'dan emit olishimiz shart bo'lmaydi, props yoki direktiv orqali ishlashimiz mumkin.
-// Bu yerda oddiy qilib qoldiramiz.
-defineProps({
-  onOpenForm: Function
-})
+// defineEmits orqali ota komponentga signal beramiz
+const emit = defineEmits(['open-form'])
 </script>
 
 <template>
@@ -27,7 +24,7 @@ defineProps({
         Muhokamalar, ovozlar va qarorlar. Jamiyat muammolarini hal qilish uchun professional platforma.
       </p>
 
-      <!-- Live Stats -->
+      <!-- Live Stats (Agar kerak bo'lsa qoldiring, kerak bo'lmasa o'chirib tashlashingiz mumkin) -->
       <div class="flex flex-wrap justify-center gap-8 mb-12 text-gray-400">
         <div class="flex items-center gap-2">
           <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
@@ -39,8 +36,9 @@ defineProps({
         </div>
       </div>
 
+      <!-- TUGMA O'ZGARTIRILDI -->
       <button 
-        @click="$emit('open-form')" 
+        @click="emit('open-form')" 
         class="group relative px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-lg font-bold rounded-full shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 overflow-hidden"
       >
         <span class="relative z-10 flex items-center gap-2">
