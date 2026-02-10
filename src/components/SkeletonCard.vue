@@ -1,43 +1,45 @@
-<script setup>
-defineProps({ lines: { type: Number, default: 2 } })
-</script>
-
 <template>
-  <div class="bg-gray-800/30 border border-gray-700/30 p-5 rounded-xl overflow-hidden">
-    <!-- Header Skeleton -->
-    <div class="flex items-center gap-3 mb-4">
-      <div class="w-8 h-8 rounded-lg bg-gray-700/50"></div>
+  <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden h-64 flex flex-col">
+    <!-- Header -->
+    <div class="p-5 border-b border-gray-800 flex items-center gap-3 bg-gray-900/50">
+      <div class="w-10 h-10 rounded-full bg-gray-800 shimmer-element"></div>
       <div class="flex-1 space-y-2">
-        <div class="h-3 bg-gray-700/50 rounded w-1/3"></div>
-        <div class="h-2 bg-gray-700/30 rounded w-1/2"></div>
+        <div class="h-3 bg-gray-800 rounded w-1/3 shimmer-element"></div>
+        <div class="h-2 bg-gray-800/50 rounded w-1/2 shimmer-element"></div>
       </div>
     </div>
 
-    <!-- Text Skeleton -->
-    <div class="space-y-2 mb-4">
-      <div class="h-2 bg-gray-700/30 rounded w-full"></div>
-      <div class="h-2 bg-gray-700/30 rounded w-5/6"></div>
+    <!-- Body -->
+    <div class="p-5 flex-1 space-y-3">
+      <div class="h-3 bg-gray-800/50 rounded w-full shimmer-element"></div>
+      <div class="h-3 bg-gray-800/50 rounded w-5/6 shimmer-element"></div>
+      <div class="h-3 bg-gray-800/50 rounded w-4/6 shimmer-element"></div>
     </div>
 
-    <!-- Button Skeleton -->
-    <div class="h-8 bg-gray-700/30 rounded-full w-24 mx-auto"></div>
+    <!-- Footer -->
+    <div class="px-5 py-3 border-t border-gray-800 flex justify-between items-center bg-gray-950">
+      <div class="h-2 bg-gray-800 rounded w-16 shimmer-element"></div>
+      <div class="h-6 bg-gray-800 rounded w-8 shimmer-element"></div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* Bu yerda "Dabdala" (porlash) animatsiyasi olib tashlandi yoki juda sekinlashtirildi */
-/* Faqat juda sekin, tushkun o'tish qo'yildi */
-@keyframes fade-load {
-  0% { opacity: 0.6; }
-  50% { opacity: 0.8; }
-  100% { opacity: 0.6; }
+.shimmer-element {
+  background: linear-gradient(
+    90deg,
+    #111827 0%,
+    #1f2937 40%, 
+    #374151 50%, 
+    #1f2937 60%, 
+    #111827 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite ease-in-out;
 }
 
-div {
-  animation: fade-load 2s ease-in-out infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  div { animation: none; opacity: 0.7; }
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 </style>

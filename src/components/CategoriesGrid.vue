@@ -1,47 +1,59 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
+import { ref } from 'vue'
 import { useProblemsStore } from '@/stores/problems'
-import { CATEGORIES } from '@/config'
 
-const { t } = useI18n()
 const problemsStore = useProblemsStore()
 
-const categoryKeys = {
-  'Suv muammosi': 'water',
-  'Elektr energiyasi': 'electricity',
-  "Yo'l ta'mirlash": 'roads',
-  'Internet / aloqa': 'internet',
-  'Chiqindi / ekologiya': 'waste',
-  Boshqa: 'other',
-}
+const categories = [
+  { id: 'Suv muammosi', label: 'Suv muammosi', icon: '💧', color: 'from-blue-500 to-cyan-500' },
+  { id: 'Elektr energiyasi', label: 'Elektr energiyasi', icon: '⚡', color: 'from-yellow-500 to-orange-500' },
+  { id: "Yo'l ta'mirlash", label: "Yo'l ta'mirlash", icon: '🛣️', color: 'from-gray-500 to-gray-700' },
+  { id: 'Internet / aloqa', label: 'Internet / aloqa', icon: '📡', color: 'from-purple-500 to-pink-500' },
+  { id: 'Chiqindi / ekologiya', label: 'Chiqindi / ekologiya', icon: '♻️', color: 'from-green-500 to-emerald-500' },
+  { id: 'Boshqa', label: 'Boshqa', icon: '⚙️', color: 'from-indigo-500 to-blue-500' },
+]
 
-function tCategory(cat) {
-  const key = categoryKeys[cat] || 'other'
-  return t(`categories.${key}`)
+function selectCategory(cat) {
+  // Clicking the same category toggles it off
+  if (problemsStore.activeCategory === cat) {
+    problemsStore.activeCategory = null
+  } else {
+    problemsStore.activeCategory = cat
+  }
 }
-
-function setActiveCategory(cat) {
-  problemsStore.activeCategory = cat
-}
-
-defineExpose({ setActiveCategory })
 </script>
 
 <template>
-  <section id="categories" class="py-16 px-4 scroll-reveal">
-    <div class="container mx-auto">
-      <h2 class="text-2xl md:text-3xl font-bold text-center mb-10 text-gray-900 dark:text-white">
-        {{ t('categories.title') }}
-      </h2>
+  <section class="py-12 bg-gray-950 relative">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl font-bold text-white text-center mb-8">Kategoriyalar</h2>
+      
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <button
-          v-for="cat in CATEGORIES"
-          :key="cat"
-          type="button"
-          class="glass-card p-4 text-center font-medium text-gray-800 dark:text-gray-200 hover:border-blue-500/30 hover:shadow-glow transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 dark:focus:ring-offset-gray-900 rounded-xl"
-          @click="setActiveCategory(cat)"
+          v-for="cat in categories"
+          :key="cat.id"
+          @click="selectCategory(cat.id)"
+          class="group relative p-4 rounded-2xl bg-gray-900 border border-gray-800 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+          :class="[
+            problemsStore.activeCategory === cat.id 
+              ? 'bg-gray-800 border-indigo-500 shadow-lg shadow-indigo-500/20 ring-2 ring-indigo-500/50' 
+              : 'hover:bg-gray-800 hover:border-gray-600'
+          ]"
         >
-          {{ tCategory(cat) }}
+          <!-- Active Glow Effect -->
+          <div v-if="problemsStore.activeCategory === cat.id" 
+               class="absolute inset-0 rounded-2xl bg-gradient-to-br opacity-10 blur-md pointer-events-none"
+               :class="cat.color">
+          </div>
+
+          <div class="flex flex-col items-center justify-center gap-3 relative z-10">
+            <div class="text-3xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-6">
+              {{ cat.icon }}
+            </div>
+            <span class="text-sm font-medium text-gray-300 group-hover:text-white text-center">
+              {{ cat.label }}
+            </span>
+          </div>
         </button>
       </div>
     </div>

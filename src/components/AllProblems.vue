@@ -1,147 +1,65 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { ref, computed } from 'vue'
 import { useProblemsStore } from '@/stores/problems'
-import { PAGINATION, CATEGORIES } from '@/config'
-import AllProblemsSkeleton from './AllProblemsSkeleton.vue'
+import { CATEGORIES } from '@/config'
 
-const { t } = useI18n()
 const problemsStore = useProblemsStore()
-const searchQuery = ref('')
-const currentPage = ref(1)
+const searchText = ref('')
+const selectedCategory = ref('')
 
-const categoryKeys = {
-  'Suv muammosi': 'water',
-  'Elektr energiyasi': 'electricity',
-  "Yo'l ta'mirlash": 'roads',
-  'Internet / aloqa': 'internet',
-  'Chiqindi / ekologiya': 'waste',
-  Boshqa: 'other',
-}
-
-function tCategory(cat) {
-  return t(`categories.${categoryKeys[cat] || 'other'}`)
-}
-
-const filtered = computed(() => {
-  let items = [...problemsStore.list]
-  if (problemsStore.activeCategory) {
-    items = items.filter((p) => p.category === problemsStore.activeCategory)
-  }
-  const q = (searchQuery.value || '').trim().toLowerCase()
-  if (q) {
-    items = items.filter((p) => (p.description || '').toLowerCase().includes(q))
-  }
-  return items.sort((a, b) => {
-    if (b.votes !== a.votes) return b.votes - a.votes
-    return (b.createdAt || '').localeCompare(a.createdAt || '')
-  })
-})
-
-const totalPages = computed(() =>
-  Math.max(1, Math.ceil(filtered.value.length / PAGINATION.PER_PAGE))
-)
-
-const paginated = computed(() => {
-  const start = (currentPage.value - 1) * PAGINATION.PER_PAGE
-  return filtered.value.slice(start, start + PAGINATION.PER_PAGE)
-})
-
-watch(
-  () => [problemsStore.activeCategory, searchQuery.value],
-  () => {
-    currentPage.value = 1
-  }
-)
-
-async function vote(id) {
-  try {
-    await problemsStore.vote(id)
-  } catch {
-    // rollback handled in store
-  }
-}
-
-onMounted(() => {
-  if (problemsStore.list.length === 0) problemsStore.fetchList()
+const filteredList = computed(() => {
+  let items = problemsStore.list
+  if (searchText.value) items = items.filter(p => p.description.toLowerCase().includes(searchText.value.toLowerCase()))
+  if (selectedCategory.value) items = items.filter(p => p.category === selectedCategory.value)
+  return items
 })
 </script>
 
 <template>
-  <section id="all-problems" class="py-16 px-4 scroll-reveal">
+  <section class="py-16 px-4 bg-gray-950 min-h-screen">
     <div class="container mx-auto max-w-4xl">
-      <h2 class="text-2xl md:text-3xl font-bold text-center mb-6 text-gray-900 dark:text-white">
-        {{ t('problems.all') }}
-      </h2>
-      <div class="flex flex-col sm:flex-row gap-4 mb-6">
-        <input
-          v-model="searchQuery"
-          type="search"
-          :placeholder="t('problems.search')"
-          class="input-focus-ring flex-1 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:border-blue-500 focus:shadow-glow transition-shadow"
-        />
-        <select
-          :value="problemsStore.activeCategory ?? ''"
-          class="input-focus-ring rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2 text-gray-900 dark:text-gray-100 min-w-[180px] focus:border-blue-500"
-          @change="(e) => (problemsStore.activeCategory = e.target.value || null)"
-        >
-          <option value="">{{ t('problems.filterByCategory') }}</option>
-          <option v-for="cat in CATEGORIES" :key="cat" :value="cat">
-            {{ tCategory(cat) }}
-          </option>
-        </select>
-      </div>
-      <AllProblemsSkeleton v-if="problemsStore.loading" />
-      <div v-else class="space-y-4">
-        <div
-          v-for="p in paginated"
-          :key="p.id"
-          class="glass-card p-4 rounded-xl border border-gray-200/50 dark:border-gray-600/50 hover:border-blue-500/20 transition-colors"
-        >
-          <p class="text-gray-700 dark:text-gray-300 mb-2">{{ p.description }}</p>
-          <div class="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-            <span>{{ tCategory(p.category) }} · {{ p.region }}</span>
-            <button
-              type="button"
-              :disabled="problemsStore.hasVoted(p.id)"
-              class="px-3 py-1 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/50 disabled:opacity-60"
-              :class="
-                problemsStore.hasVoted(p.id)
-                  ? 'bg-blue-500/20 text-blue-600 dark:text-blue-400 cursor-default'
-                  : 'bg-gray-200/80 dark:bg-gray-600/80 hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-400 hover:scale-[1.02] hover:shadow-glow'
-              "
-              @click="vote(p.id)"
-            >
-              {{ problemsStore.hasVoted(p.id) ? t('problems.liked') : t('problems.like') }} ({{
-                p.votes
-              }})
-            </button>
+      <h2 class="text-3xl font-bold text-white mb-10 text-center">Barcha muammolar</h2>
+      
+      <!-- Modern Search Bar -->
+      <div class="relative group mb-12">
+        <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+        <div class="relative flex items-center bg-gray-900 border border-gray-700 rounded-xl p-1 overflow-hidden focus-within:ring-2 focus-within:ring-indigo-500/50 transition-shadow">
+          <!-- Search Icon -->
+          <div class="pl-4 text-gray-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
           </div>
+          
+          <!-- Input -->
+          <input 
+            v-model="searchText" 
+            type="text" 
+            placeholder="Muammoni qidiring..." 
+            class="w-full bg-transparent border-none text-white px-4 py-3 focus:outline-none placeholder-gray-500 text-lg"
+          >
+          
+          <!-- Dropdown -->
+          <select v-model="selectedCategory" class="bg-gray-800 text-gray-300 border border-gray-600 rounded-lg px-3 py-2 focus:outline-none cursor-pointer hover:bg-gray-700 transition">
+            <option value="">Barchasi</option>
+            <option v-for="c in CATEGORIES" :key="c" :value="c">{{ c }}</option>
+          </select>
         </div>
-        <p v-if="paginated.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-8">
-          {{ t('problems.noResults') }}
-        </p>
       </div>
-      <div v-if="totalPages > 1" class="flex justify-center gap-2 mt-6">
-        <button
-          type="button"
-          :disabled="currentPage <= 1"
-          class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-50 hover:border-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-          @click="currentPage--"
-        >
-          ←
-        </button>
-        <span class="px-4 py-2 text-gray-600 dark:text-gray-300">
-          {{ currentPage }} / {{ totalPages }}
-        </span>
-        <button
-          type="button"
-          :disabled="currentPage >= totalPages"
-          class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 disabled:opacity-50 hover:border-blue-500/50 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
-          @click="currentPage++"
-        >
-          →
-        </button>
+
+      <!-- List -->
+      <div class="space-y-4">
+        <div v-for="p in filteredList" :key="p.id" class="bg-gray-900 border border-gray-800 p-6 rounded-xl hover:border-gray-600 transition-all group">
+           <div class="flex justify-between items-start">
+             <div class="flex-1">
+               <div class="flex gap-2 mb-2">
+                 <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">{{ p.category }}</span>
+                 <span class="text-xs text-gray-500">📍 {{ p.region }}</span>
+               </div>
+               <p class="text-gray-300">{{ p.description }}</p>
+             </div>
+             <span class="text-gray-500 font-bold ml-4 text-lg">{{ p.votes }} 👍</span>
+           </div>
+        </div>
+        <p v-if="filteredList.length === 0" class="text-center text-gray-500 py-12 text-lg">Hech narsa topilmadi</p>
       </div>
     </div>
   </section>
