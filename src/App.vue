@@ -1,3 +1,4 @@
+
 <script setup>
 import { ref, onMounted } from 'vue'
 import Navbar from './components/Navbar.vue'
@@ -9,41 +10,14 @@ import HowItWorks from './components/HowItWorks.vue'
 import Footer from './components/Footer.vue'
 import ProblemForm from './components/ProblemForm.vue'
 import { useProblemsStore } from './stores/problems'
-
-const showFormModal = ref(false)
-const problemsStore = useProblemsStore()
-
-function openForm() {
-  showFormModal.value = true
-}
-
-function closeForm() {
-  showFormModal.value = false
-  problemsStore.fetchList()
-}
-
-onMounted(() => {
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (reduced) return
-  import('gsap').then(({ gsap }) => {
-    import('gsap/ScrollTrigger').then(({ ScrollTrigger }) => {
-      gsap.registerPlugin(ScrollTrigger)
-      gsap.utils.toArray('.scroll-reveal').forEach((el) => {
-        gsap.from(el, {
-          scrollTrigger: { trigger: el, start: 'top 88%' },
-          y: 24,
-          opacity: 0,
-          duration: 0.4,
-          ease: 'power2.out',
-        })
-      })
-    })
-  })
-})
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <!-- 
+    !IMPORTANT: bg-gray-950 qo'shildi va classlar qattiq belgilandi 
+    min-h-[100vh] sahifani cho'zilib ketishdan saqlaydi
+  -->
+  <div class="min-h-screen bg-[#020617] text-gray-100 overflow-x-hidden">
     <Navbar @open-form="openForm" />
     <main>
       <Hero @open-form="openForm" />
@@ -56,3 +30,11 @@ onMounted(() => {
     <ProblemForm v-if="showFormModal" @close="closeForm" />
   </div>
 </template>
+
+<style>
+/* Global override: Oq fonni hech qachon chiqarmaydi */
+body {
+  background-color: #020617 !important;
+  color: #e5e7eb !important;
+}
+</style>
